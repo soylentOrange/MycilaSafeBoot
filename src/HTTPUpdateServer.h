@@ -4,11 +4,11 @@
 #include <Update.h>
 #include <WebServer.h>
 
-#ifdef SAFEBOOT_LOGGING
-  #define LOG(format, ...) Serial.printf(format, ##__VA_ARGS__)
-#else
-  #define LOG(format, ...)
-#endif
+// #ifdef SAFEBOOT_LOGGING
+//   #define LOG(format, ...) Serial.printf(format, ##__VA_ARGS__)
+// #else
+//   #define LOG(format, ...)
+// #endif
 
 extern const char* __COMPILED_APP_VERSION__;
 extern const uint8_t update_html_start[] asm("_binary__pio_embed_website_html_gz_start");
@@ -66,12 +66,12 @@ class HTTPUpdateServer {
 
           if (upload.status == UPLOAD_FILE_START) {
             _updaterError.clear();
-            int otaMode = U_FLASH;
-            if (_server->hasArg("mode") && _server->arg("mode") == "1") {
-              otaMode = U_SPIFFS;
-            }
-            LOG("Mode: %d\n", otaMode);
-            if (!Update.begin(UPDATE_SIZE_UNKNOWN, otaMode)) { // start with max available size
+            // int otaMode = U_FLASH;
+            // if (_server->hasArg("mode") && _server->arg("mode") == "1") {
+            //   otaMode = U_SPIFFS;
+            // }
+            // LOG("Mode: %d\n", otaMode);
+            if (!Update.begin(UPDATE_SIZE_UNKNOWN, U_FLASH)) { // start with max available size
               _setUpdaterError();
             }
           } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
