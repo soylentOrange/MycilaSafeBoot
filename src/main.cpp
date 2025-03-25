@@ -15,27 +15,16 @@
   #include <ESPmDNS.h>
 #endif
 
-#ifdef MYCILA_LOGGER_SUPPORT
-  #include <MycilaLogger.h>
-Mycila::Logger logger;
-  #define LOGD(tag, format, ...) logger.debug(tag, format, ##__VA_ARGS__)
-  #define LOGI(tag, format, ...) logger.info(tag, format, ##__VA_ARGS__)
-  #define LOGW(tag, format, ...) logger.warn(tag, format, ##__VA_ARGS__)
-  #define LOGE(tag, format, ...) logger.error(tag, format, ##__VA_ARGS__)
+#ifdef SAFEBOOT_LOGGING
+  #define LOG(format, ...) Serial.printf(format, ##__VA_ARGS__)
 #else
-  #define LOGD(tag, format, ...)
-  #define LOGI(tag, format, ...)
-  #define LOGW(tag, format, ...)
-  #define LOGE(tag, format, ...)
+  #define LOG(format, ...)
 #endif
-
-#define TAG "SafeBoot"
 
 static WebServer webServer(80);
 static HTTPUpdateServer httpUpdater;
 static Mycila::ESPConnect espConnect;
 static Mycila::ESPConnect::Config espConnectConfig;
-static String hostname;
 
 static String getChipIDStr() {
   uint32_t chipId = 0;
@@ -48,7 +37,7 @@ static String getChipIDStr() {
 }
 
 void setup() {
-#ifdef MYCILA_LOGGER_SUPPORT
+#ifdef SAFEBOOT_LOGGING
   Serial.begin(115200);
   #if ARDUINO_USB_CDC_ON_BOOT
   Serial.setTxTimeoutMs(0);
@@ -57,22 +46,16 @@ void setup() {
   while (!Serial)
     yield();
   #endif
-
-  logger.forwardTo(&Serial);
-  logger.setLevel(ARDUHAL_LOG_LEVEL_DEBUG);
 #endif
 
-  // Init hostname
-  hostname = "SafeBoot-" + getChipIDStr();
-  LOGI(TAG, "SafeBoot Version: %s", __COMPILED_APP_VERSION__);
-  LOGI(TAG, "Chip ID: %s", getChipIDStr().c_str());
-  LOGI(TAG, "Hostname: %s", hostname.c_str());
+  LOG("Version: %s\n", __COMPILED_APP_VERSION__);
 
   // Set next boot partition
   const esp_partition_t* partition = esp_partition_find_first(esp_partition_type_t::ESP_PARTITION_TYPE_APP, esp_partition_subtype_t::ESP_PARTITION_SUBTYPE_APP_OTA_0, nullptr);
   if (partition) {
     esp_ota_set_boot_partition(partition);
   }
+
   // setup routes
   httpUpdater.setup(&webServer, "/");
   webServer.onNotFound([]() {
@@ -84,6 +67,11 @@ void setup() {
   espConnect.loadConfiguration(espConnectConfig);
   espConnect.setBlocking(true);
   espConnect.setAutoRestart(false);
+
+  // reuse a potentially set hostname from main app, or set a default one
+  if (!espConnectConfig.hostname.length()) {
+    espConnectConfig.hostname = "SafeBoot-" + getChipIDStr();
+  }
 
   // If the passed config is to be in AP mode, or has a SSID that's fine.
   // If the passed config is empty, we need to check if the board supports ETH.
@@ -100,7 +88,7 @@ void setup() {
 
   espConnect.listen([](Mycila::ESPConnect::State previous, Mycila::ESPConnect::State state) {
     if (state == Mycila::ESPConnect::State::NETWORK_TIMEOUT) {
-      LOGW(TAG, "Connect timeout! Starting AP mode instead...");
+      LOG("Connect timeout! Starting AP mode...\n");
       // if ETH DHCP times out, we start AP mode
       espConnectConfig.apMode = true;
       espConnect.setConfig(espConnectConfig);
@@ -108,33 +96,32 @@ void setup() {
   });
 
   // connect...
-  espConnect.begin(hostname.c_str(), hostname.c_str(), "", espConnectConfig);
+  espConnect.begin(espConnectConfig.hostname.c_str(), "", espConnectConfig);
 
-  LOGI(TAG, "Connected to network!");
-  LOGI(TAG, "IP Address: %s", espConnect.getIPAddress().toString().c_str());
-  LOGI(TAG, "Hostname: %s", espConnect.getHostname().c_str());
-  if (espConnect.getWiFiSSID().length()) {
-    LOGI(TAG, "WiFi SSID: %s", espConnect.getWiFiSSID().c_str());
+  if (espConnectConfig.apMode) {
+    LOG("AP: %s\n", espConnect.getAccessPointSSID().c_str());
+  } else if (espConnect.getWiFiSSID().length()) {
+    LOG("SSID: %s\n", espConnect.getWiFiSSID().c_str());
   }
+  LOG("IP: %s\n", espConnect.getIPAddress().toString().c_str());
+  LOG("Hostname: %s\n", espConnect.getHostname().c_str());
 
-  // starte http
-  LOGI(TAG, "Starting HTTP server...");
+  // start http
   webServer.begin();
+  LOG("Web Server started\n");
 
 #ifndef MYCILA_SAFEBOOT_NO_MDNS
   // Start mDNS
-  MDNS.begin(hostname.c_str());
+  MDNS.begin(espConnectConfig.hostname.c_str());
   MDNS.addService("http", "tcp", 80);
 #endif
 
   // Start OTA
-  LOGI(TAG, "Starting OTA server...");
-  ArduinoOTA.setHostname(hostname.c_str());
+  ArduinoOTA.setHostname(espConnectConfig.hostname.c_str());
   ArduinoOTA.setRebootOnSuccess(true);
   ArduinoOTA.setMdnsEnabled(true);
   ArduinoOTA.begin();
-
-  LOGI(TAG, "Done!");
+  LOG("OTA Server started on port 3232\n");
 }
 
 void loop() {

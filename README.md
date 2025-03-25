@@ -26,7 +26,7 @@ The idea is not new: [Tasmota also uses a SafeBoot partition](https://tasmota.gi
   - [Options matrix](#options-matrix)
 - [Default board options](#default-board-options)
 
-[![](https://mathieu.carbou.me/MycilaSafeBoot/safeboot-ssid.jpeg)](https://mathieu.carbou.me/MycilaSafeBoot/safeboot-ssid.jpeg)
+![](https://private-user-images.githubusercontent.com/61346/426535795-7eda5f6e-7900-4380-921f-8e54fb2b2e2c.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDI5MDgwOTEsIm5iZiI6MTc0MjkwNzc5MSwicGF0aCI6Ii82MTM0Ni80MjY1MzU3OTUtN2VkYTVmNmUtNzkwMC00MzgwLTkyMWYtOGU1NGZiMmIyZTJjLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMjUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzI1VDEzMDMxMVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPThkNTVjMTJjNzZmNzdiYWZkZjkxZWE4ZTkxOWM4MTQ1MzliZTFhNzRkZmU5NzY5MTk2MWJmMjQyYzJiN2Y1OTAmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.7vsJcZDQrAa4Z_G4R663ENGhQDNTleVThGd6x8GAnGo)
 
 ## Overview
 
@@ -245,10 +245,10 @@ if (partition) {
 
 Squezing everything into the SafeBoot partition (655360 bytes only) is a tight fit especially on ethernet enabled boards.
 
-Disabling the logging capabilites saves about 12 kbytes in the final build. Just comment out `MYCILA_LOGGER_SUPPORT` in `platformio.ini`.
+Disabling the logging capabilites saves about 12 kbytes in the final build. Just comment out `SAFEBOOT_LOGGING` in `platformio.ini`.
 
 ```ini
-; -D MYCILA_LOGGER_SUPPORT
+; -D SAFEBOOT_LOGGING
 ```
 
 Disabling mDNS saves about 24 kbytes. Enable both [...]\_NO_DNS options in `platformio.ini` to reduce the build size:
@@ -502,10 +502,10 @@ if (partition) {
 
 Squezing everything into the SafeBoot partition (655360 bytes only) is a tight fit especially on ethernet enabled boards.
 
-Disabling the logging capabilites saves about 12 kbytes in the final build. Just comment out `MYCILA_LOGGER_SUPPORT` in `platformio.ini`.
+Disabling the logging capabilites saves about 12 kbytes in the final build. Just comment out `SAFEBOOT_LOGGING` in `platformio.ini`.
 
 ```ini
-; -D MYCILA_LOGGER_SUPPORT
+; -D SAFEBOOT_LOGGING
 ```
 
 Disabling mDNS saves about 24 kbytes. Enable both [...]\_NO_DNS options in `platformio.ini` to reduce the build size:
