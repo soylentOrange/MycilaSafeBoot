@@ -131,13 +131,6 @@
         width: 100%;
       }
 
-      /* h1 {
-      text-align: center;
-      font-size: 24px;
-      display: none;
-      margin: 48px auto 24px auto;
-    } */
-
       h1 {
         text-align: center;
         font-size: 24px;
@@ -173,75 +166,11 @@
         border-radius: 5px;
         background: rgb(75, 75, 75);
         color: white;
-        /* -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none; */
       }
 
       .svg_badge {
         margin-bottom: 15px;
       }
-
-      /* .logo {
-        margin: 12px auto 0 auto;
-      } */
-
-      /* h4 {
-        font-size: 16px;
-        color: gray;
-        margin: auto;
-      } */
-
-      /* .mode_switch_container {
-        display: flex;
-        padding-left: 10px;
-        padding-right: 10px;
-      }
-
-      .toggle_switch_container {
-        width: 51px;
-        height: 26px;
-        position: relative;
-      }
-
-      .toggle_switch_checkbox {
-        opacity: 0;
-        width: 0;
-        height: 0;
-        position: absolute;
-      }
-
-      .toggle_switch_switch {
-        width: 100%;
-        height: 100%;
-        display: block;
-        background-color: rgb(75, 75, 75);
-        border-radius: 13px;
-        cursor: pointer;
-        transition: all 0.2s ease-out;
-      } */
-
-      /* .toggle_switch_slider {
-        width: 20px;
-        height: 20px;
-        position: absolute;
-        left: calc(50% - 20px / 2 - 12px);
-        top: calc(50% - 20px / 2);
-        border-radius: 50%;
-        background: white;
-        transition: all 0.2s ease-out;
-        cursor: pointer;
-      }
-
-      .toggle_switch_checkbox:checked
-        + .toggle_switch_switch
-        .toggle_switch_slider {
-        left: calc(50% - 20px / 2 + 12px);
-        top: calc(50% - 20px / 2);
-      } */
 
       .loader_badge {
         margin-bottom: 15px;
@@ -261,20 +190,9 @@
         margin-top: 69px;
         width: 46px;
         height: 46px;
-        /* -webkit-animation: spin 1s linear infinite; */
         animation: spin 1s linear infinite;
         cursor: wait;
       }
-
-      /* @-webkit-keyframes spin {
-        0% {
-          -webkit-transform: rotate(0deg);
-        }
-
-        100% {
-          -webkit-transform: rotate(360deg);
-        }
-      } */
 
       @keyframes spin {
         0% {
@@ -291,29 +209,12 @@
   <body>
     <div class="header">
       <h1 id="title">SafeBoot Firmware Update</h1>
-      <!-- <img id="logo" src="/safeboot_logo" alt="Logo" class="logo"
-      onerror="document.getElementById('logo').remove();document.getElementById('title').style.display = 'block';" /> -->
       <h5 id="help_text">
         Upload a firmware/file system image here, or use Over-the-Air (OTA)
         update in PlatformIO with Arduino OTA on port 3232.
       </h5>
     </div>
     <div class="shadow_container">
-
-      <!-- <div class="mode_switch_container" id="mode_switch_container">
-        <h4 id="label_firmware">Firmware</h4>
-        <div class="toggle_switch_container">
-          <input
-            type="checkbox"
-            class="toggle_switch_checkbox"
-            id="toggle_switch_checkbox"
-          />
-          <label class="toggle_switch_switch" for="toggle_switch_checkbox">
-            <span class="toggle_switch_slider"></span>
-          </label>
-        </div>
-        <h4 id="label_filesystem">File System</h4>
-      </div> -->
 
       <div class="drop_zone" id="drop_zone">
         <svg
@@ -425,28 +326,12 @@
       const clickable_file_input = document.getElementById(
         "clickable_file_input"
       );
-      // const label_firmware = document.getElementById("label_firmware");
-      // const label_filesystem = document.getElementById("label_filesystem");
-      // const mode_container = document.getElementById("mode_switch_container");
-      // const mode_checkbox = document.getElementById("toggle_switch_checkbox");
       const info_text_chipspecs = document.getElementById(
         "info_text_chipspecs"
       );
       const info_text_buildname = document.getElementById(
         "info_text_buildname"
       );
-
-      // Hack for captive portal on apple devices
-      // The browser is very limited and won't open a file upload dialog
-      // thus, we'll only present the option to drag-and-drop
-      // if (
-      //   navigator.userAgent.match(
-      //     ".*(AppleWebKit){1}.*(\(KHTML, like Gecko\).?)$"
-      //   )
-      // ) {
-      //   clickable_file_input.innerHTML =
-      //     "accepts<br />one firmware (.bin) file";
-      // }
 
       // fetch some text info from a given url
       async function getInfo(info_url) {
@@ -480,18 +365,6 @@
       }
 
       getInfos();
-
-      // label_firmware.style.color = "black";
-
-      // mode_checkbox.addEventListener("change", function () {
-      //   if (mode_checkbox.checked) {
-      //     label_firmware.style.color = "gray";
-      //     label_filesystem.style.color = "black";
-      //   } else {
-      //     label_firmware.style.color = "black";
-      //     label_filesystem.style.color = "gray";
-      //   }
-      // });
 
       file_input.type = "file";
       file_input.accept = ".bin";
@@ -561,7 +434,6 @@
       }
 
       async function uploadFile(fileList) {
-        // const fw_mode = mode_checkbox.checked ? "1" : "0";
 
         var filename_text = document.getElementById("filename_text");
         filename_text.innerHTML = "Uploading: " + fileList[0].name;
@@ -569,7 +441,7 @@
         data.append("file", fileList[0]);
 
         showProgressContainer();
-        const url = "/?size=" + fileList[0].size // + "&mode=" + fw_mode;
+        const url = "/?size=" + fileList[0].size;
         const xhr = new XMLHttpRequest();
         xhr.upload.addEventListener("progress", (event) => {
           updateProgressBar(event.loaded / event.total);
@@ -649,7 +521,6 @@
         progress_container.style.display = "block";
         info_area.style.display = "none";
         help_text.innerHTML = " ";
-        // mode_container.style.display = "none";
       }
 
       function showResultContainer() {
@@ -661,7 +532,6 @@
         svg_error.style.display = "none";
         result_loader.style.display = "block";
         help_text.innerHTML = " ";
-        // mode_container.style.display = "none";
       }
     </script>
   </body>
