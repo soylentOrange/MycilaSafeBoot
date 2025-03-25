@@ -15,6 +15,7 @@ extern const uint8_t update_html_start[] asm("_binary__pio_embed_website_html_gz
 extern const uint8_t update_html_end[] asm("_binary__pio_embed_website_html_gz_end");
 static const char* successResponse = "Update Success! Rebooting...";
 static const char* cancelResponse = "Rebooting...";
+static const char* textPlain = "text/plain";
 
 class HTTPUpdateServer {
   public:
@@ -30,7 +31,7 @@ class HTTPUpdateServer {
         path == "/" ? "/cancel" : (path + "/cancel"),
         HTTP_POST,
         [&]() {
-          _server->send(200, "text/plain", cancelResponse);
+          _server->send(200, textPlain, cancelResponse);
           _server->client().stop();
           delay(500);
           ESP.restart();
@@ -49,10 +50,10 @@ class HTTPUpdateServer {
         HTTP_POST,
         [&]() {
           if (Update.hasError()) {
-            _server->send(500, "text/plain", "Update error: " + _updaterError);
+            _server->send(500, textPlain, "Update error: " + _updaterError);
           } else {
             _server->client().setNoDelay(true);
-            _server->send(200, "text/plain", successResponse);
+            _server->send(200, textPlain, successResponse);
             _server->client().stop();
             delay(500);
             ESP.restart();
@@ -87,16 +88,16 @@ class HTTPUpdateServer {
           delay(0);
         });
 
-      // serve boardname info (when available)
+      // serve esp-chip model and flash size info
       _server->on("/chipspecs", HTTP_GET, [&]() {
         String chipSpecs = ESP.getChipModel();
         chipSpecs += " (" + String(ESP.getFlashChipSize() >> 20) + " MB)";
-        _server->send(200, "text/plain", chipSpecs.c_str());
+        _server->send(200, textPlain, chipSpecs.c_str());
       });
 
-      // serve sbversion info (when available)
+      // serve SafeBoot version-info
       _server->on("/sbversion", HTTP_GET, [&]() {
-        _server->send(200, "text/plain", __COMPILED_APP_VERSION__);
+        _server->send(200, textPlain, __COMPILED_APP_VERSION__);
       });
     }
 

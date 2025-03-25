@@ -25,6 +25,7 @@ static WebServer webServer(80);
 static HTTPUpdateServer httpUpdater;
 static Mycila::ESPConnect espConnect;
 static Mycila::ESPConnect::Config espConnectConfig;
+extern const char* textPlain;
 
 static String getChipIDStr() {
   uint32_t chipId = 0;
@@ -60,7 +61,7 @@ void setup() {
   httpUpdater.setup(&webServer, "/");
   webServer.onNotFound([]() {
     webServer.sendHeader("Location", "/");
-    webServer.send(302, "text/plain", "");
+    webServer.send(302, textPlain, "");
   });
 
   // load ESPConnect configuration
