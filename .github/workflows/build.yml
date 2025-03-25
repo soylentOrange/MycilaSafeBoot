@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     tags: ["v*"]
-    branches: ["main"]
+    branches: ["*"]
     paths-ignore: ["docs/**", "**/*.md"]
   pull_request:
     paths-ignore: ["docs/**", "**/*.md"]
@@ -61,14 +61,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-
-      - name: Install npm
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-
-      - name: Install html-minifier-terser
-        run: npm install -g html-minifier-terser
 
       - name: Build
         run: |
